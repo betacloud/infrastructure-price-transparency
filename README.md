@@ -1,4 +1,4 @@
-# Price comparison
+# Infrastructure price transparency
 
 The visualization is based on https://github.com/catalyst-cloud/catalystcloud-price-comparison.
 Consult the documentation there for explanations of the visualization.
