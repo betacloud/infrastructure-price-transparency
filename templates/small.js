@@ -10,30 +10,6 @@ var chart = new Chart(ctx, {
         labels: [{{ labels }}],
         datasets: [
           {
-              label: "Betacloud",
-              pointRadius: 0,
-              borderWidth: 2,
-              tension: 0,
-              fill: false,
-              data: [{{ betacloud_data }}],
-          },
-          {
-              label: "Netways",
-              pointRadius: 0,
-              borderWidth: 2,
-              tension: 0,
-              fill: false,
-              data: [{{ netways_data }}],
-          },
-          {
-              label: "Teutostack",
-              pointRadius: 0,
-              borderWidth: 2,
-              tension: 0,
-              fill: false,
-              data: [{{ teutostack_data }}],
-          },
-          {
               label: "OVH",
               pointRadius: 0,
               borderWidth: 2,

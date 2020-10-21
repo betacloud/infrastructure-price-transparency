@@ -10,13 +10,10 @@ This would be too imprecise and inefficient with this approach.
 ## Usage
 
 ```
-$ docker build -t price-comparison .
-$ docker run -v $(pwd):/home -it price-comparison
-# python src/analyse.py
-Downloaded Betacloud prices, with 8 items.
-[...]
-Saving resulting datasets.
-# python src/visualise.py
+$ docker build -t infrastructure-price-comparison .
+$ docker run -v $(pwd):/home -it infrastructure-price-comparison
+# python3 src/analyse.py
+# python3 src/visualise.py
 ```
 
 ## References
