@@ -24,9 +24,6 @@ def csv_to_graph(csv_path):
 
     # Sort by mean price across providers
     rows_to_get_mean = df[[
-        'Betacloud price per hour, EUR',
-        'Netways price per hour, EUR',
-        'Teutostack price per hour, EUR',
         'OVH price per hour, EUR',
         'Citycloud price per hour, EUR',
         'Google price per hour, EUR',
@@ -78,9 +75,6 @@ def csv_to_graph(csv_path):
         return prices
 
     # Extract price data.
-    betacloud_data = get_price_string('Betacloud price per hour, EUR')
-    netways_data = get_price_string('Netways price per hour, EUR')
-    teutostack_data = get_price_string('Teutostack price per hour, EUR')
     ovh_data = get_price_string('OVH price per hour, EUR')
     citycloud_data = get_price_string('Citycloud price per hour, EUR')
     google_data = get_price_string('Google price per hour, EUR')
@@ -97,9 +91,6 @@ def csv_to_graph(csv_path):
     data_filled_js = graph_data_template.render(
         labels=names_list,
         today=datetime.datetime.now().strftime("%d.%m.%Y"),
-        betacloud_data=betacloud_data,
-        netways_data=netways_data,
-        teutostack_data=teutostack_data,
         ovh_data=ovh_data,
         citycloud_data=citycloud_data,
         google_data=google_data,
@@ -116,9 +107,6 @@ def csv_to_graph(csv_path):
     data_filled_js = graph_data_template.render(
         labels='"1 vCPU, 1 GB RAM", "2 vCPUs, 2 GB RAM", "4 vCPUs, 4 GB RAM", "4 vCPUs, 8 GB RAM", "8 vCPUs, 16 GB RAM"',
         today=datetime.datetime.now().strftime("%d.%m.%Y"),
-        betacloud_data=str.join(", ", betacloud_data.split(", ")[0:5]),
-        netways_data=str.join(", ", netways_data.split(", ")[0:5]),
-        teutostack_data=str.join(", ", teutostack_data.split(", ")[0:5]),
         ovh_data=str.join(", ", ovh_data.split(", ")[0:5]),
         citycloud_data=str.join(", ", citycloud_data.split(", ")[0:5]),
         google_data=str.join(", ", google_data.split(", ")[0:5]),
@@ -131,5 +119,5 @@ def csv_to_graph(csv_path):
     with open('result/small.js', 'w') as graph_js:
         graph_js.write(data_filled_js)
 
-csv_path = 'predicted-dataset/predicted_betacloud_prices.csv'
+csv_path = 'predicted-dataset/predicted_citycloud_prices.csv'
 csv_to_graph(csv_path)

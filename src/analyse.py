@@ -26,108 +26,9 @@ usd_to_eur_exchange_rate_url = 'https://free.currencyconverterapi.com/api/v6/con
 usd_to_eur_exchange_rate_json = requests.get(usd_to_eur_exchange_rate_url).json()
 usd_to_eur_exchange_rate = float(usd_to_eur_exchange_rate_json['USD_EUR'])
 
-# Betacloud
-
-betacloud_url = 'https://pricing.betacloud.io/'
-betacloud_data_location = 'dataset/betacloud_price_data.csv'
-betacloud_gst_exclusive = True
-
-betacloud_price_page_html = requests.get(betacloud_url).text
-betacloud_price_page = BeautifulSoup(betacloud_price_page_html, 'html.parser')
-
-betacloud_price_table = betacloud_price_page.find('table').tbody
-betacloud_price_rows = betacloud_price_table.find_all('tr')
-
-betacloud_prices_list = []
-
-for row in betacloud_price_rows:
-    betacloud_price_cells = list(row.stripped_strings)
-
-    betacloud_prices_list.append({
-        'Name': betacloud_price_cells[0],
-        'vCPU': float(betacloud_price_cells[1]),
-        'RAM, GB': float(betacloud_price_cells[2]),
-        'Price per hour, EUR': float(betacloud_price_cells[4].strip('$')),
-#        'SSD storage, GB': float(betacloud_price_cells[3]),
-        'SSD storage, GB': .0,
-        'HDD storage, GB': .0
-    })
-
-# Convert to csv
-betacloud_dataframe = pd.DataFrame(betacloud_prices_list)
-betacloud_dataframe.to_csv(betacloud_data_location)
-
-print('Downloaded Betacloud prices, with {} items.'.format(betacloud_dataframe.shape[0]))
-
-# Netways
-
-netways_url = 'https://nws.netways.de/products/openstack'
-netways_data_location = 'dataset/netways_price_data.csv'
-netways_gst_exclusive = True
-
-netways_price_page_html = requests.get(netways_url).text
-netways_price_page = BeautifulSoup(netways_price_page_html, 'html.parser')
-
-netways_price_div = netways_price_page.find(id='preconf1')
-netways_price_table = netways_price_div.find('table').tbody
-netways_price_rows = netways_price_table.find_all('tr')
-
-netways_prices_list = []
-
-for row in netways_price_rows:
-    netways_price_cells = list(row.stripped_strings)
-
-    if netways_price_cells[0].startswith('s2'):
-        netways_prices_list.append({
-            'Name': netways_price_cells[0],
-            'vCPU': float(netways_price_cells[1]),
-            'RAM, GB': float(netways_price_cells[2].strip('GB')),
-            'Price per hour, EUR': float(netways_price_cells[8].strip('€')) / 30 / 24,
-#            'SSD storage, GB': float(netways_price_cells[3].strip('GB')),
-            'SSD storage, GB': .0,
-            'HDD storage, GB': .0
-        })
-
-# Convert to csv
-netways_dataframe = pd.DataFrame(netways_prices_list)
-netways_dataframe.to_csv(netways_data_location)
-
-print('Downloaded Netways prices, with {} items.'.format(netways_dataframe.shape[0]))
-
-# Teutostack
-
-teutostack_url = "https://teutostack.de/wp-content/uploads/2019/01/out_teutostack_teutostack-leistungsverzeichnis-2019-01-28.pdf"
-teutostack_data_location = 'dataset/teutostack_price_data.csv'
-teutostack_gst_exclusive = True
-
-teutostack_prices_list = []
-
-parsed = parser.from_file('/tmp/out_teutostack_teutostack-leistungsverzeichnis-2019-01-28.pdf')
-content = parsed["content"]
-result = re.findall("^(standard.*) (.*) Core.*, (.*) GiB RAM, (.*) GiB local Disc (.*)€ €.*$", content, re.MULTILINE)
-
-for entry in result:
-    name, vcpus, ram, storage, price = entry
-
-    teutostack_prices_list.append({
-        'Name': name,
-        'vCPU': float(vcpus),
-        'RAM, GB': float(ram),
-        'Price per hour, EUR': float(price.replace(",", ".")),
-#        'SSD storage, GB': float(storage),
-        'SSD storage, GB': 0,
-        'HDD storage, GB': .0
-    })
-
-# Convert to csv
-teutostack_dataframe = pd.DataFrame(teutostack_prices_list)
-teutostack_dataframe.to_csv(teutostack_data_location)
-
-print('Downloaded Teutostack prices, with {} items.'.format(teutostack_dataframe.shape[0]))
-
 # OVH
 
-ovh_url = 'https://www.ovh.com/world/public-cloud/instances/prices/'
+ovh_url = 'https://www.ovhcloud.com/de/public-cloud/prices/'
 ovh_data_location = 'dataset/ovh_price_data.csv'
 ovh_gst_exclusive = True
 
@@ -235,7 +136,7 @@ print('Downloaded Azure prices, with {} items.'.format(azure_dataframe.shape[0])
 
 # OTC
 
-otc_url = "https://open-telekom-cloud.com/resource/blob/data/160462/0662e233681ca01247fef6a386c62d81/open-telekom-cloud-leistungsbeschreibung.pdf"
+otc_url = "https://open-telekom-cloud.com/resource/blob/data/160462/9772ae6e12c4299ce2fa6efe60a603af/open-telekom-cloud-leistungsbeschreibung.pdf"
 otc_data_location = 'dataset/otc_price_data.csv'
 otc_gst_exclusive = True
 
@@ -455,9 +356,6 @@ google_dataframe.to_csv(google_data_location)
 
 print('Downloaded Google prices, with {} items.'.format(google_dataframe.shape[0]))
 
-betacloud_dataset = pd.read_csv(betacloud_data_location, index_col=0)
-netways_dataset = pd.read_csv(netways_data_location, index_col=0)
-teutostack_dataset = pd.read_csv(teutostack_data_location, index_col=0)
 ovh_dataset = pd.read_csv(ovh_data_location, index_col=0)
 citycloud_dataset = pd.read_csv(citycloud_data_location, index_col=0)
 google_dataset = pd.read_csv(google_data_location, index_col=0)
@@ -470,9 +368,6 @@ def filter_dataset (dataset):
     
     return without_high_ram
 
-betacloud_dataset = filter_dataset(betacloud_dataset)
-netways_dataset = filter_dataset(netways_dataset)
-teutostack_dataset = filter_dataset(teutostack_dataset)
 ovh_dataset = filter_dataset(ovh_dataset)
 citycloud_dataset = filter_dataset(citycloud_dataset)
 google_dataset = filter_dataset(google_dataset)
@@ -486,9 +381,6 @@ def split_dataset (dataset):
     
     return (x, y)
 
-betacloud_x, betacloud_y = split_dataset(betacloud_dataset)
-netways_x, netways_y = split_dataset(netways_dataset)
-teutostack_x, teutostack_y = split_dataset(teutostack_dataset)
 ovh_x, ovh_y = split_dataset(ovh_dataset)
 citycloud_x, citycloud_y = split_dataset(citycloud_dataset)
 google_x, google_y = split_dataset(google_dataset)
@@ -497,9 +389,6 @@ aws_x, aws_y = split_dataset(aws_dataset)
 azure_x, azure_y = split_dataset(azure_dataset)
 
 # Initialise regressors
-betacloud_linear = LinearRegression()
-netways_linear = LinearRegression()
-teutostack_linear = LinearRegression()
 ovh_linear = LinearRegression()
 citycloud_linear = LinearRegression()
 google_linear = LinearRegression()
@@ -508,9 +397,6 @@ aws_linear = LinearRegression()
 azure_linear = LinearRegression()
 
 # Train regressors
-betacloud_linear.fit(betacloud_x, betacloud_y)
-netways_linear.fit(netways_x, netways_y)
-teutostack_linear.fit(teutostack_x, teutostack_y)
 ovh_linear.fit(ovh_x, ovh_y)
 citycloud_linear.fit(citycloud_x, citycloud_y)
 google_linear.fit(google_x, google_y)
@@ -518,15 +404,12 @@ otc_linear.fit(otc_x, otc_y)
 aws_linear.fit(aws_x, aws_y)
 azure_linear.fit(azure_x, azure_y)
 
-# Predict Betacloud X
-netways_betacloud_price = netways_linear.predict(betacloud_x)
-teutostack_betacloud_price = teutostack_linear.predict(betacloud_x)
-ovh_betacloud_price = ovh_linear.predict(betacloud_x)
-citycloud_betacloud_price = citycloud_linear.predict(betacloud_x)
-google_betacloud_price = google_linear.predict(betacloud_x)
-otc_betacloud_price = otc_linear.predict(betacloud_x)
-aws_betacloud_price = aws_linear.predict(betacloud_x)
-azure_betacloud_price = azure_linear.predict(betacloud_x)
+# Predict Citycloud X
+ovh_citycloud_price = ovh_linear.predict(citycloud_x)
+google_citycloud_price = google_linear.predict(citycloud_x)
+otc_citycloud_price = otc_linear.predict(citycloud_x)
+aws_citycloud_price = aws_linear.predict(citycloud_x)
+azure_citycloud_price = azure_linear.predict(citycloud_x)
 
 def pred_save (origin_flavors, provider_names, predictions):
     
@@ -539,14 +422,14 @@ def pred_save (origin_flavors, provider_names, predictions):
     
     return flavor_data
 
-final_betacloud_data = pred_save(
-    betacloud_dataset,
+final_citycloud_data = pred_save(
+    citycloud_dataset,
     [
-        "Betacloud", "Citycloud", "Google", "AWS", "OVH", "Teutostack", "Azure", "Netways", "OTC"
+        "Citycloud", "Google", "AWS", "OVH", "Azure", "OTC"
     ], [
-        betacloud_y, citycloud_betacloud_price, google_betacloud_price, aws_betacloud_price, ovh_betacloud_price, teutostack_betacloud_price, azure_betacloud_price, netways_betacloud_price, otc_betacloud_price
+        citycloud_y, google_citycloud_price, aws_citycloud_price, ovh_citycloud_price, azure_citycloud_price, otc_citycloud_price
     ])
 
 print('Saving resulting datasets.')
 
-final_betacloud_data.to_csv('predicted-dataset/predicted_betacloud_prices.csv')
+final_citycloud_data.to_csv('predicted-dataset/predicted_citycloud_prices.csv')
